@@ -1,0 +1,247 @@
+macro "macro"
+	elem
+		name = "North"
+		command = "move-key 1 1"
+	elem
+		name = "North+UP"
+		command = "move-key 1 0"
+	elem
+		name = "South"
+		command = "move-key 2 1"
+	elem
+		name = "South+UP"
+		command = "move-key 2 0"
+	elem
+		name = "East"
+		command = "move-key 4 1"
+	elem
+		name = "East+UP"
+		command = "move-key 4 0"
+	elem
+		name = "West"
+		command = "move-key 8 1"
+	elem
+		name = "West+UP"
+		command = "move-key 8 0"
+	elem
+		name = "W"
+		command = "move-key 1 1"
+	elem
+		name = "W+UP"
+		command = "move-key 1 0"
+	elem
+		name = "S"
+		command = "move-key 2 1"
+	elem
+		name = "S+UP"
+		command = "move-key 2 0"
+	elem
+		name = "D"
+		command = "move-key 4 1"
+	elem
+		name = "D+UP"
+		command = "move-key 4 0"
+	elem
+		name = "A"
+		command = "move-key 8 1"
+	elem
+		name = "A+UP"
+		command = "move-key 8 0"
+
+
+window "mainwindow"
+	elem "mainwindow"
+		type = MAIN
+		pos = 0,0
+		size = 1280x720
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-default = true
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Animated icons on a hidden map"
+		statusbar = false
+		can-resize = true
+		can-minimize = true
+		background-color = #2b2b30
+		macro = "macro"
+	elem "map"
+		type = MAP
+		pos = 0,0
+		size = 988x720
+		anchor1 = 0,0
+		anchor2 = 100,100
+		is-default = true
+		zoom = 2
+		background-color = #000000
+	elem "title"
+		type = LABEL
+		pos = 1004,16
+		size = 260x20
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "map2"
+		align = left
+		text-wrap = true
+		text-color = #e8e8ee
+		background-color = #2b2b30
+		font-style = bold
+	elem "map2_frame"
+		type = LABEL
+		pos = 1004,40
+		size = 104x104
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = ""
+		background-color = #18181c
+	elem "b_hide"
+		type = BUTTON
+		pos = 1004,160
+		size = 260x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Hide map2"
+		command = "toggle-map2"
+	elem "b_still"
+		type = BUTTON
+		pos = 1004,196
+		size = 260x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Use still icons"
+		command = "toggle-still"
+	elem "b_remove"
+		type = BUTTON
+		pos = 1004,232
+		size = 260x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Remove map2"
+		command = "toggle-remove"
+	elem "b_fewer"
+		type = BUTTON
+		pos = 1004,268
+		size = 127x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "- 50 icons"
+		command = "fewer-icons"
+	elem "b_more"
+		type = BUTTON
+		pos = 1137,268
+		size = 127x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "+ 50 icons"
+		command = "more-icons"
+	elem "b_remake"
+		type = BUTTON
+		pos = 1004,304
+		size = 260x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Remake map2"
+		command = "remake-map2"
+	elem "b_tiny"
+		type = BUTTON
+		pos = 1004,340
+		size = 127x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Shrink to 1 px"
+		command = "toggle-tiny"
+	elem "b_away"
+		type = BUTTON
+		pos = 1137,340
+		size = 127x30
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Move out of sight"
+		command = "toggle-away"
+	elem "status"
+		type = LABEL
+		pos = 1004,396
+		size = 260x40
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = ""
+		align = left
+		text-wrap = true
+		text-color = #ffd27a
+		background-color = #2b2b30
+	elem "help0"
+		type = LABEL
+		pos = 1004,440
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "Walk with the arrow keys or WASD and watch the glide."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help1"
+		type = LABEL
+		pos = 1004,478
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "1. map2 showing (100 animated icons): smooth."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help2"
+		type = LABEL
+		pos = 1004,516
+		size = 260x18
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "2. Hide map2 and walk: it stutters."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help3"
+		type = LABEL
+		pos = 1004,538
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "3. Show it again: smooth. With more icons on map2, the stutter gets worse."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help4"
+		type = LABEL
+		pos = 1004,576
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "4. Use still icons, then hide map2: smooth."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help5"
+		type = LABEL
+		pos = 1004,614
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "5. Remove map2 (its screen objects stay): smooth."
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30
+	elem "help6"
+		type = LABEL
+		pos = 1004,652
+		size = 260x34
+		anchor1 = 100,0
+		anchor2 = 100,0
+		text = "6. Shrink or move map2 out of sight instead of hiding it: smooth?"
+		align = left
+		text-wrap = true
+		text-color = #c8c8d0
+		background-color = #2b2b30

@@ -1,0 +1,18 @@
+// A bug report demo: animated icons on a hidden map control make the main map's movement stutter.
+// Open this file in Dream Maker, compile and run. See README.md. Keep the folder named "hidden_map_animation":
+// Dream Seeker only treats a world's folder as its own when it matches the .dmb name.
+
+// BEGIN_INTERNALS
+// END_INTERNALS
+
+// BEGIN_FILE_DIR
+#define FILE_DIR .
+// END_FILE_DIR
+
+// BEGIN_PREFERENCES
+// END_PREFERENCES
+
+// BEGIN_INCLUDE
+#include "hidden_map_animation.dm"
+#include "hidden_map_animation.dmf"
+// END_INCLUDE
