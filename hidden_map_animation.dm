@@ -7,7 +7,7 @@
 	  Hide map2 / Show map2         map2's is-visible: walking stutters while it's hidden with an animated icon on it
 	  Use a still icon / animated   the same with a still icon on map2: hiding it then makes no difference
 	  Remove map2 / Make map2       deletes the control (the screen object stays, pointing at a map that isn't there)
-	  Remake map2                   deletes and makes it again at once: the hitch of making a map
+	  Remake map2                   deletes and makes it again at once (the hitch of making a map), showing and full size
 	  Shrink to 1 px                map2 switched on but 1 x 1 pixel: out of sight without being hidden
 	  Move out of sight             map2 switched on but outside the window
 
@@ -18,7 +18,7 @@
 */
 
 // Walking as ReiaMAX does it (its src/core/mob.dm and modules/keyboard): 50 fps, a step every move_delay (5 ticks)
-// paced in whole ticks with the glide fitted to it, and held keys stepping every tick through the client's North()...
+// paced in whole ticks with the glide fitted to it. Held keys are stepped from world.Tick(), every tick.
 
 world
 	fps = 50
@@ -71,10 +71,15 @@ mob/walker
 		if(!.)
 			move_time = was
 
-// Held keys: each movement key reports its press and release; while any is held, a step is tried every tick.
+// Held keys: each movement key reports its press and release; while any is held, world.Tick() tries a step every tick.
+var/list/walking_clients = list()
+
+world/Tick()
+	for(var/client/C as anything in walking_clients)
+		C.StepHeld()
+
 client
 	var/move_keys = 0 // held: NORTH, SOUTH, EAST, WEST bits
-	var/moving = FALSE
 
 	verb/move_key(dir as num, down as num)
 		set name = "move-key"
@@ -86,22 +91,23 @@ client
 			move_keys |= dir
 		else
 			move_keys &= ~dir
-		if(move_keys && !moving)
-			MoveLoop()
+		if(move_keys)
+			walking_clients |= src
+		else
+			walking_clients -= src
 
-	proc/MoveLoop()
-		set waitfor = FALSE
-		moving = TRUE
-		while(move_keys)
-			var/d = move_keys
-			if((d & NORTH) && (d & SOUTH))
-				d &= ~(NORTH | SOUTH)
-			if((d & EAST) && (d & WEST))
-				d &= ~(EAST | WEST)
-			if(d)
-				Move(get_step(mob, d), d)
-			sleep(world.tick_lag)
-		moving = FALSE
+	proc/StepHeld()
+		var/d = move_keys
+		if((d & NORTH) && (d & SOUTH))
+			d &= ~(NORTH | SOUTH)
+		if((d & EAST) && (d & WEST))
+			d &= ~(EAST | WEST)
+		if(d)
+			Move(get_step(mob, d), d)
+
+	Del()
+		walking_clients -= src
+		return ..()
 
 obj/on_map2
 	icon = 'icons.dmi'
@@ -138,10 +144,16 @@ client
 			shown += O
 			screen += O
 
+	// Makes map2 if it isn't there, as it starts: showing, at full size, in its frame.
 	proc/MakeMap2()
+		map2_hidden = FALSE
+		map2_parked = null
+		map2_removed = FALSE
+		Buttons()
 		if(!winexists(src, "map2"))
-			winset(src, "map2", "parent=mainwindow;type=map;[Map2Place()];anchor1=100,0;anchor2=100,0;zoom=1;background-color=#18181c")
-		winset(src, "map2", "is-visible=[map2_hidden ? "false" : "true"]")
+			winset(src, "map2", "parent=mainwindow;type=map;anchor1=100,0;anchor2=100,0;zoom=1;background-color=#18181c")
+		// Placed and shown every time, in case the old control was still there.
+		winset(src, "map2", "[Map2Place()];is-visible=true")
 
 	// Where map2 goes: inside its frame, wherever the frame is now (it keeps to the window's right edge), or parked.
 	proc/Map2Place()
@@ -158,14 +170,16 @@ client
 		map2_parked = map2_parked == how ? null : how
 		if(winexists(src, "map2"))
 			winset(src, "map2", Map2Place())
-		winset(src, "b_tiny", "text=\"[map2_parked == "tiny" ? "Full size" : "Shrink to 1 px"]\"")
-		winset(src, "b_away", "text=\"[map2_parked == "away" ? "Move back" : "Move out of sight"]\"")
+		Buttons()
 		if(map2_parked == "tiny")
 			Status("map2 shrunk to 1 pixel, still switched on. Walk: does it stutter?")
 		else if(map2_parked == "away")
 			Status("map2 moved outside the window, still switched on. Walk: does it stutter?")
 		else
 			Status("map2 back in its place.")
+
+	proc/Buttons()
+		winset(src, null, {"b_hide.text="[map2_hidden ? "Show map2" : "Hide map2"]";b_remove.text="[map2_removed ? "Make map2" : "Remove map2"]";b_tiny.text="[map2_parked == "tiny" ? "Full size" : "Shrink to 1 px"]";b_away.text="[map2_parked == "away" ? "Move back" : "Move out of sight"]""})
 
 	proc/Status(text)
 		winset(src, "status", "text=\"[text]\"")
@@ -176,7 +190,7 @@ client
 			map2_hidden = !map2_hidden
 			if(winexists(src, "map2"))
 				winset(src, "map2", "is-visible=[map2_hidden ? "false" : "true"]")
-			winset(src, "b_hide", "text=\"[map2_hidden ? "Show map2" : "Hide map2"]\"")
+			Buttons()
 			Status(map2_hidden ? "map2 hidden. Walk: does it stutter?" : "map2 showing.")
 
 		toggle_still()
@@ -207,16 +221,17 @@ client
 
 		remake_map2()
 			set name = "remake-map2"
-			winset(src, "map2", "parent=")
+			if(winexists(src, "map2"))
+				winset(src, "map2", "parent=")
 			MakeMap2()
-			Status("map2 removed and made again at once. A hitch?")
+			Status("map2 removed and made again at once, showing at full size. A hitch?")
 
 		toggle_remove()
 			set name = "toggle-remove"
 			map2_removed = !map2_removed
 			if(map2_removed)
 				winset(src, "map2", "parent=")
+				Buttons()
 			else
 				MakeMap2()
-			winset(src, "b_remove", "text=\"[map2_removed ? "Make map2" : "Remove map2"]\"")
 			Status(map2_removed ? "map2 removed (its screen objects kept)." : "map2 made again.")
